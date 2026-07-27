@@ -158,12 +158,6 @@ Khuyến nghị khi chạy notebook: đặt current working directory là folder
 temporal_top5_rerank_final_private_task/
 ```
 
-Nếu chạy trên Kaggle và current working directory là `/kaggle/working`, output sẽ nằm tại:
-
-```text
-/kaggle/working/temporal_top5_rerank_final_private_task/
-```
-
 ## Cần BTC xác nhận hoặc sửa cụ thể
 
 Mình đã quét path trong thư mục này và thấy các điểm sau chưa thật rõ:
