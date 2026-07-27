@@ -24,17 +24,6 @@ Các lệnh bên dưới được giữ nguyên theo README gốc. Phần mình 
 3. Stage 3: gộp folder keyframes, retrieve candidates, rồi rerank.
 4. Final Stage: đưa output JSON vào notebook `finalStage_temporal_frames.ipynb`.
 
-## Quy ước path dữ liệu
-
-- Repo này đã có folder `OmniShotCut/`. Đây là source repo GitHub `OmniShotCut`, tức folder có package `omnishotcut/...`.
-- `REPO_ROOT` trong các script Stage 1 là nơi trỏ tới folder chứa source `OmniShotCut`.
-- `stage1_extract_keyframe.py` hiện dùng `REPO_ROOT = "OmniShotCut"`.
-- `stage1_extract_extra.py` hiện đã dùng `OmniShotCut/` ngay trong repo này.
-- Vì vậy nên chạy các command từ folder repo để path tương đối `OmniShotCut` resolve đúng.
-- Dataset video dùng folder `V3C`; bên trong folder này có hai folder `V3C1` và `V3C2`.
-- Layout video mà script Stage 1 tìm là `<dataset-root>/videos/<video_number>/<video_number>.mp4`.
-- Các lệnh Stage 1 hiện đang dùng `/V3C/V3C1` và `/V3C/V3C2`. Nếu môi trường chạy mount dataset thành `/V3C` thì path này đúng. Nếu BTC đặt folder `V3C` ngay trong repo sau khi clone GitHub, path tương ứng sẽ là `V3C/V3C1` và `V3C/V3C2`.
-
 ## Cài dependencies
 
 Môi trường chạy cần có sẵn `python3`, `torch` và `torchvision`.
