@@ -2,7 +2,6 @@
 
 README này mô tả lại thứ tự chạy pipeline trong thư mục `temporun2026_reproduce`.
 
-Các lệnh bên dưới được giữ nguyên theo README gốc. Phần mình chỉnh chỉ là cấu trúc tài liệu, tiêu đề, ghi chú và cách trình bày.
 
 ## File chính trong thư mục
 
@@ -158,9 +157,7 @@ Khuyến nghị khi chạy notebook: đặt current working directory là folder
 temporal_top5_rerank_final_private_task/
 ```
 
-## Cần BTC xác nhận hoặc sửa cụ thể
+## Cần BTC sửa cụ thể
 
-Mình đã quét path trong thư mục này và thấy các điểm sau chưa thật rõ:
-
-- Cần xác nhận BTC sẽ mount dataset video thành `/V3C`. Nếu không, các lệnh Stage 1 cần đổi `/V3C/V3C1`, `/V3C/V3C2` sang path thật của folder `V3C`.
+- Cần xác nhận sẽ mount dataset video thành `/V3C`. Nếu không, các lệnh Stage 1 cần đổi `/V3C/V3C1`, `/V3C/V3C2` sang path thật của folder `V3C`.
 - Khi chạy `finalStage_temporal_frames.ipynb`, cần đảm bảo current working directory có đủ `submission_final_8B_rerank500_10.json`, `private_round_tasks.jsonl`, `V3C/` và `Qwen3-VL-Reranker-8B/`.
