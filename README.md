@@ -164,18 +164,6 @@ Nếu chạy trên Kaggle và current working directory là `/kaggle/working`, o
 /kaggle/working/temporal_top5_rerank_final_private_task/
 ```
 
-## Các path Kaggle/runtime đang còn trong code gốc
-
-| File | Path | Ý nghĩa |
-| --- | --- | --- |
-| `stage2_embedding_frames.py` | `/kaggle/working/final_shard.pt` | Default dummy output của lệnh `embed-pt`. |
-| `stage2_retrieve_and_reranker.py` | `/kaggle/working/checkpoints` | Default `--checkpoint-dir` của subcommand `embed-pt` trong file này. |
-
-Các path runtime ngoài `/kaggle`:
-
-- `stage2_embedding_frames.py`: `root/hf_cache`, `/root/checkpoints`.
-- `stage2_retrieve_and_reranker.py`: `/root/hf_cache`.
-
 ## Cần BTC xác nhận hoặc sửa cụ thể
 
 Mình đã quét path trong thư mục này và thấy các điểm sau chưa thật rõ:
