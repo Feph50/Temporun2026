@@ -45,21 +45,21 @@ Output mong đợi sau stage này:
 ```bash
 # extract middle frames of each shot.
 python3 stage1_extract_keyframe.py \
-  --dataset-root "/V3C/V3C1" \
-  --dataset-root "/V3C/V3C2" \
-  --out "/TempoRun2026_OmniShotCut_Keyframes"
+--dataset-root "/V3C/V3C1" \
+--dataset-root "/V3C/V3C2" \
+--out "/TempoRun2026_OmniShotCut_Keyframes"
 
 # extract extra frames
 python3 stage1_extract_extra.py \
-  --ranges-root "/TempoRun2026_OmniShotCut_Keyframes" \
-  --out "/TempoRun2026_OmniShotCut_Extra_Keyframes_More" \
-  --candidate-fps 2 \
-  --cosine-threshold 0.97 \
-  --output-mode extras_only \
-  --filename-digits 6 \
-  --batch-size 128 \
-  --jpeg-quality 92 \
-  --device cuda
+--ranges-root "/TempoRun2026_OmniShotCut_Keyframes" \
+--out "/TempoRun2026_OmniShotCut_Extra_Keyframes_More" \
+--candidate-fps 2 \
+--cosine-threshold 0.97 \
+--output-mode extras_only \
+--filename-digits 6 \
+--batch-size 128 \
+--jpeg-quality 92 \
+--device cuda
 ```
 
 ## Stage 2 - Embed keyframes và merge index
