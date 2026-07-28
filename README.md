@@ -73,21 +73,21 @@ Sau đó merge các file `.pt` thành index cuối.
 
 ```bash
 python3 stage2_embedding_frames.py embed-pt  \
-  --keyframes TempoRun2026_OmniShotCut_Keyframes   \
-  --checkpoint-dir checkpoints_part  \
-  --load-in-4bit   \
-  --batch-size 32
+--keyframes TempoRun2026_OmniShotCut_Keyframes   \
+--checkpoint-dir checkpoints_part  \
+--load-in-4bit   \
+--batch-size 32
 
 python3 stage2_embedding_frames.py embed-pt  \
-  --keyframes "TempoRun2026_OmniShotCut_Extra_Keyframes_More"   \
-  --checkpoint-dir checkpoints_part  \
-  --load-in-4bit   \
-  --batch-size 32
+--keyframes "TempoRun2026_OmniShotCut_Extra_Keyframes_More"   \
+--checkpoint-dir checkpoints_part  \
+--load-in-4bit   \
+--batch-size 32
 
 # Merge cac file .pt cho mọi video
 python3 stage2_embedding_frames.py merge \
-    --checkpoint-dir checkpoints_part \
-    --out qwen3vl_final_full_index_8B.pt
+--checkpoint-dir checkpoints_part \
+--out qwen3vl_final_full_index_8B.pt
 ```
 
 Output mong đợi:
@@ -104,23 +104,23 @@ Trước khi chạy, hãy sửa tên `1_CausalScoreHead` bên trong `modules.jso
 python3 merge_temporun_keyframes_windows.py
 
 python3 stage2_retrieve_and_reranker.py retrieve  \
-  --model-id "Qwen3-VL-Embedding-8B"   \
-  --index-pt "qwen3vl_final_full_index_8B.pt"  \
-  --tasks "private_round_tasks.jsonl"   \
-  --load-in-4bit  \
-  --top-videos 200  \
-  --frames-per-video 257  \
-  --out "retrieval_candidates_8B.json"
+--model-id "Qwen3-VL-Embedding-8B"   \
+--index-pt "qwen3vl_final_full_index_8B.pt"  \
+--tasks "private_round_tasks.jsonl"   \
+--load-in-4bit  \
+--top-videos 200  \
+--frames-per-video 257  \
+--out "retrieval_candidates_8B.json"
 
 python3 stage2_retrieve_and_reranker.py rerank  \
-  --model-id "Qwen3-VL-Reranker-8B"  \
-  --candidates "retrieval_candidates_8B.json"  \
-  --tasks "private_round_tasks.jsonl"  \
-  --index-pt "qwen3vl_final_full_index_8B.pt"  \
-  --keyframes "TempoRun2026_OmniShotCut_Keyframes_Combined" \
-  --rerank-top 500  \
-  --final-top 10   \
-  --out "submission_final_8B_rerank500_10.json"
+--model-id "Qwen3-VL-Reranker-8B"  \
+--candidates "retrieval_candidates_8B.json"  \
+--tasks "private_round_tasks.jsonl"  \
+--index-pt "qwen3vl_final_full_index_8B.pt"  \
+--keyframes "TempoRun2026_OmniShotCut_Keyframes_Combined" \
+--rerank-top 500  \
+--final-top 10   \
+--out "submission_final_8B_rerank500_10.json"
 ```
 
 Output mong đợi:
