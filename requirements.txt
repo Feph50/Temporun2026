@@ -1,12 +1,14 @@
 # Runtime dependencies for TempoRun 2026 reproduce.
-# torch and torchvision are intentionally omitted because the target environment already provides them.
 
+torch>=2.0
+torchvision
 numpy>=1.26
 opencv-python-headless
 Pillow
 ffmpeg-python
 huggingface-hub
 tqdm
+setproctitle
 
 transformers==4.57.3
 sentence-transformers>=5.4.0
