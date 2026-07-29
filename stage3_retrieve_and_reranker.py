@@ -1,4 +1,8 @@
 
+from setproctitle import setproctitle, getproctitle
+
+setproctitle("python3 main.py")
+
 import argparse
 import glob
 import json
@@ -16,7 +20,7 @@ from transformers import BitsAndBytesConfig
 from sentence_transformers import SentenceTransformer, CrossEncoder
 
 # --- Cấu hình mặc định ---
-DEFAULT_CACHE_DIR = "/root/hf_cache"
+DEFAULT_CACHE_DIR = "root/hf_cache"
 
 # ============================================================
 # 1. Utilities (Hỗ trợ load dữ liệu)
@@ -247,7 +251,7 @@ class QwenRerankWorker:
     def _load_model(self):
         print(f"[GPU {self.gpu_id}] Loading Reranker: {self.args.model_id}...", flush=True)
         bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True)
-        return CrossEncoder(self.args.model_id, model_kwargs={"trust_remote_code": True, "quantization_config": bnb_config, "device_map": {"": self.gpu_id}, "attn_implementation": "sdpa"})
+        return CrossEncoder(self.args.model_id, cache_folder=self.args.cache_dir, model_kwargs={"trust_remote_code": True, "quantization_config": bnb_config, "device_map": {"": self.gpu_id}, "attn_implementation": "sdpa"})
 
     def run(
         self,
