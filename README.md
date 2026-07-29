@@ -6,7 +6,7 @@
 - Tên phương pháp: `TempoRun 2026 OmniShotCut + Qwen3-VL Temporal Reproduce`
 - Đường dẫn repository: `https://github.com/Feph50/Temporun2026`
 - Phương thức cài đặt môi trường: `Docker`
-- Cấu hình phần cứng đã kiểm thử: `RTX 2080 Ti 11GB, Python 3.10.15, Ubuntu 22.04, CUDA 12.1 devel`
+- Cấu hình phần cứng đã kiểm thử: `RTX 2080 Ti 11GB, Python 3.10.15, Ubuntu 22.04, NVIDIA driver 580.82.09`
 - Lệnh chạy chính: xem mục 8 và 9
 - Thông tin liên hệ: `0886920075`
 
@@ -31,7 +31,9 @@ Pipeline này dùng OmniShotCut để tách shot, lấy keyframe giữa shot, si
 
 - GPU tối thiểu khuyến nghị: `RTX 2080 Ti 11GB`
 - Nếu có nhiều GPU, code đã được thiết kế để chạy song song và tận dụng đa GPU tốt hơn.
-- Môi trường đã kiểm tra: Ubuntu 22.04, Python 3.10.15, CUDA 12.1 devel runtime, NVIDIA driver 580.82.09, CUDA 13.0 trên host
+- Môi trường tham chiếu: Ubuntu 22.04, Python 3.10.15, NVIDIA driver 580.82.09
+- Docker base image: `cnstark/pytorch:2.3.1-py3.10.15-cuda12.1.0-devel-ubuntu22.04`
+- Container cần update để đúng như cấu hình: `torch 2.11.0+cu128`, `torch.version.cuda = 12.8`, `nvidia-smi CUDA Version = 13.0`
 - `torch`, `torchvision`
 - `ffmpeg` binary trên `PATH`
 - CUDA-compatible environment
