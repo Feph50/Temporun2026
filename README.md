@@ -1,5 +1,15 @@
 # TempoRun 2026 Reproduce
 
+## Thông tin nộp bài
+
+- Tên đội: `Tôi thăng cấp một mình`
+- Tên phương pháp: `TempoRun 2026 OmniShotCut + Qwen3-VL Temporal Reproduce`
+- Đường dẫn repository: `https://github.com/Feph50/Temporun2026`
+- Phương thức cài đặt môi trường: `Docker`
+- Cấu hình phần cứng đã kiểm thử: `RTX 2080 Ti 11GB, Python 3.10.15, Ubuntu 22.04, CUDA 12.1 devel`
+- Lệnh chạy chính: xem mục 8 và 9
+- Thông tin liên hệ: `0886920075`
+
 ## 1. Giới thiệu ngắn gọn về phương pháp
 
 Pipeline này dùng OmniShotCut để tách shot, lấy keyframe giữa shot, sinh thêm extra frames, tạo embedding bằng Qwen3-VL-Embedding-8B, sau đó retrieve và rerank bằng Qwen3-VL-Reranker-8B. Kết quả cuối được tinh chỉnh thêm bằng notebook temporal rerank.
@@ -257,7 +267,7 @@ Một số tham số mặc định chính:
 - `ffmpeg` binary phải có sẵn trên máy.
 - Đường dẫn dataset phải đúng với mount thực tế; nếu mount khác `/V3C` thì cần đổi theo môi trường chạy.
 - `modules.json` của `Qwen3-VL-Reranker-8B` có thể cần tên module tương thích như README đã ghi.
-- Notebook final stage yêu cầu đủ `submission_final_8B_rerank500_10.json`, `private_round_tasks.jsonl`, `V3C/` và `root/hf_cache/models--Qwen--Qwen3-VL-Reranker-8B/{id snapshot tương ứng}` trong working directory.
+- Notebook final stage yêu cầu đủ `submission_final_8B_rerank500_10.json`, `private_round_tasks.jsonl`, `V3C/` và `Qwen3-VL-Reranker-8B/` trong working directory.
 - Nếu video path lưu trong metadata bị stale, stage 1/extra có fallback scan dataset nhưng vẫn cần corpus truy cập được.
 
 ## Cần BTC sửa cụ thể
