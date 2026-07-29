@@ -103,8 +103,8 @@ Trước khi chạy, hãy sửa tên `1_CausalScoreHead` bên trong `modules.jso
 # Gộp 2 folder keyframes lại.
 python3 merge_temporun_keyframes_windows.py
 
-python3 stage2_retrieve_and_reranker.py retrieve  \
---model-id root/hf_cache/models--Qwen--Qwen3-VL-Embedding-8B/snapshots/{id snapshot tương ứng}   \
+python3 stage3_retrieve_and_reranker.py retrieve  \
+--model-id "Qwen/Qwen3-VL-Embedding-8B"   \
 --index-pt "qwen3vl_final_full_index_8B.pt"  \
 --tasks "private_round_tasks.jsonl"   \
 --load-in-4bit  \
@@ -112,7 +112,7 @@ python3 stage2_retrieve_and_reranker.py retrieve  \
 --frames-per-video 257  \
 --out "retrieval_candidates_8B.json"
 
-python3 stage2_retrieve_and_reranker.py rerank  \
+python3 stage3_retrieve_and_reranker.py rerank  \
 --model-id "Qwen/Qwen3-VL-Reranker-8B"  \
 --candidates "retrieval_candidates_8B.json"  \
 --tasks "private_round_tasks.jsonl"  \
