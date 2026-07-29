@@ -257,7 +257,7 @@ Một số tham số mặc định chính:
 - `ffmpeg` binary phải có sẵn trên máy.
 - Đường dẫn dataset phải đúng với mount thực tế; nếu mount khác `/V3C` thì cần đổi theo môi trường chạy.
 - `modules.json` của `Qwen3-VL-Reranker-8B` có thể cần tên module tương thích như README đã ghi.
-- Notebook final stage yêu cầu đủ `submission_final_8B_rerank500_10.json`, `private_round_tasks.jsonl`, `V3C/` và `Qwen3-VL-Reranker-8B/` trong working directory.
+- Notebook final stage yêu cầu đủ `submission_final_8B_rerank500_10.json`, `private_round_tasks.jsonl`, `V3C/` và `root/hf_cache/models--Qwen--Qwen3-VL-Reranker-8B/{id snapshot tương ứng}` trong working directory.
 - Nếu video path lưu trong metadata bị stale, stage 1/extra có fallback scan dataset nhưng vẫn cần corpus truy cập được.
 
 ## Cần BTC sửa cụ thể
