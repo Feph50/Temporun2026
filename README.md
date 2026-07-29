@@ -104,7 +104,7 @@ Trước khi chạy, hãy sửa tên `1_CausalScoreHead` bên trong `modules.jso
 python3 merge_temporun_keyframes_windows.py
 
 python3 stage2_retrieve_and_reranker.py retrieve  \
---model-id "Qwen3-VL-Embedding-8B"   \
+--model-id root/hf_cache/models--Qwen--Qwen3-VL-Embedding-8B/snapshots/{id snapshot tương ứng}   \
 --index-pt "qwen3vl_final_full_index_8B.pt"  \
 --tasks "private_round_tasks.jsonl"   \
 --load-in-4bit  \
