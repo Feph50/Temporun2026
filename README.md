@@ -31,17 +31,9 @@ Khi chạy các lệnh stage 1, 2, 3 và notebook, checkpoint `Qwen/Qwen3-VL-Emb
 
 ## 4. Hướng dẫn cài đặt môi trường
 
-Các package còn lại cài bằng:
-
-```bash
-pip install -r requirements.txt
-```
-
-Lưu ý: `ffmpeg-python` là Python wrapper. Môi trường chạy vẫn cần có binary `ffmpeg` nếu dùng các hàm decode video của OmniShotCut.
-
 ### Docker
 
-Chạy từ thư mục `Temporun2026`:
+Đây là đường chạy chính. Chạy từ thư mục `Temporun2026`:
 
 ```bash
 docker build -t temporun2026:latest .
@@ -51,6 +43,16 @@ docker run --gpus all -it --rm \
   -w /workspace/Temporun2026 \
   temporun2026:latest
 ```
+
+### Cài tay ngoài Docker
+
+Chỉ dùng khi không chạy bằng Docker:
+
+```bash
+pip install -r requirements.txt
+```
+
+Lưu ý: `ffmpeg-python` là Python wrapper. Môi trường chạy vẫn cần có binary `ffmpeg` nếu dùng các hàm decode video của OmniShotCut.
 
 ## 5. Hướng dẫn tải checkpoint hoặc tài nguyên bổ sung
 
@@ -95,15 +97,23 @@ Các script stage sau dùng:
 
 ## 7. Mô tả kết quả đầu ra
 
-Kết quả trung gian và cuối:
+Khi chạy xong từng phần, code sẽ tạo ra các đầu ra sau:
 
-- `TempoRun2026_OmniShotCut_Keyframes`
-- `TempoRun2026_OmniShotCut_Extra_Keyframes_More`
-- `checkpoints_part`
-- `qwen3vl_final_full_index_8B.pt`
-- `retrieval_candidates_8B.json`
-- `submission_final_8B_rerank500_10.json`
-- `temporal_top5_rerank_final_private_task/`
+- Stage 1:
+  - `TempoRun2026_OmniShotCut_Keyframes/`
+  - `TempoRun2026_OmniShotCut_Extra_Keyframes_More/`
+  - mỗi video có `k_*.jpg`, `ts_ms.npy`, và file metadata tương ứng
+- Stage 2:
+  - `checkpoints_part/`
+  - `qwen3vl_final_full_index_8B.pt`
+- Stage 3:
+  - `retrieval_candidates_8B.json`
+  - `submission_final_8B_rerank500_10.json`
+- Final stage notebook:
+  - `temporal_top5_rerank_final_private_task/`
+  - `submission_final_temporal_top5_private.json`
+  - `submission_final_temporal_top5_private.zip`
+  - `temporal_top5_scores.csv`
 
 Output JSON cuối phải có khóa ngoài cùng là `predictions` và giữ đúng `task_id`, `rank`, `video_id`, `frame_ms`.
 
@@ -182,7 +192,7 @@ python3 stage3_retrieve_and_reranker.py rerank  \
 
 ### Final stage notebook
 
-Lấy output là file `submission_final_8B_rerank500_10.json` để nạp vào file `finalStage_temporal_frames.ipynb`.
+Lấy output là file `submission_final_8B_rerank500_10.json` để nạp vào file `finalStage_temporal_frames.ipynb`. Notebook sẽ tạo thêm JSON nộp cuối, file ZIP tương ứng và CSV chẩn đoán trong `temporal_top5_rerank_final_private_task/`.
 
 ## 9. Lệnh chạy toàn bộ pipeline
 
