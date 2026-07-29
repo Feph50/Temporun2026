@@ -204,7 +204,35 @@ python3 stage3_retrieve_and_reranker.py rerank  \
 
 ### Final stage notebook
 
-Lấy output là file `submission_final_8B_rerank500_10.json` để nạp vào file `finalStage_temporal_frames.ipynb`. Notebook sẽ tạo thêm JSON nộp cuối, file ZIP tương ứng và CSV chẩn đoán trong `temporal_top5_rerank_final_private_task/`.
+Notebook `finalStage_temporal_frames.ipynb` là bước temporal rerank cuối sau khi đã có `submission_final_8B_rerank500_10.json`.
+
+Input mặc định của notebook:
+
+- `submission_final_8B_rerank500_10.json`: output từ lệnh Stage 3 rerank.
+- `private_round_tasks.jsonl`: dùng để lấy query text theo `task_id`.
+- `V3C/`: folder video corpus, bên trong có `V3C1/videos` và `V3C2/videos`.
+- `Qwen3-VL-Reranker-8B/`: folder model reranker local cho final temporal scoring.
+
+Logic chính của notebook:
+
+- Đọc top 10 prediction của từng task.
+- Chỉ rerank top 5 candidate đầu tiên; rank 6-10 được giữ làm phần đuôi.
+- Với mỗi candidate trong top 5, notebook tạo các clip ngắn quanh `frame_ms` gốc.
+- Mỗi center được dịch theo `local_shifts_ms = (-250, 0, 250)`.
+- Với mỗi shifted center, clip dùng các timestamp offset `(-1000, -500, 0, 500, 1000)` ms.
+- Mỗi candidate lấy score tốt nhất theo công thức `raw_score - distance_penalty * abs(shift_ms) / 1000`.
+- Có local shot-cut guard để tránh clip vượt qua biên shot quá mạnh.
+- Candidate thắng chỉ được đưa lên rank 1 nếu đồng thời:
+  - `winner_score - old_rank1_score >= 0.15`
+  - `winner_score - runner_up_score >= 0.10`
+- Nếu đủ điều kiện, notebook dùng move-to-front cho winner; nếu không đủ, giữ nguyên thứ tự top 5.
+- Notebook không thay đổi `frame_ms` trong output, chỉ thay đổi thứ tự rank.
+
+Output của notebook nằm trong `temporal_top5_rerank_final_private_task/`:
+
+- `submission_final_temporal_top5_private.json`: JSON kết quả cuối.
+- `submission_final_temporal_top5_private.zip`: file ZIP chứa `submission.json`, dùng để nộp nếu BTC yêu cầu nộp ZIP.
+- `temporal_top5_scores.csv`: file chẩn đoán score, shift tốt nhất, margin và trạng thái promote.
 
 ## 9. Lệnh chạy toàn bộ pipeline
 
