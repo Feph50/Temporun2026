@@ -211,7 +211,7 @@ Input mặc định của notebook:
 - `submission_final_8B_rerank500_10.json`: output từ lệnh Stage 3 rerank.
 - `private_round_tasks.jsonl`: dùng để lấy query text theo `task_id`.
 - `V3C/`: folder video corpus, bên trong có `V3C1/videos` và `V3C2/videos`.
-- `Qwen3-VL-Reranker-8B/`: folder model reranker local cho final temporal scoring.
+- `Qwen3-VL-Reranker-8B/`: folder model reranker local cho final temporal scoring (Cần đưa đúng path định dạng `root/hf_cache/models--Qwen--Qwen3-VL-Reranker-8B/snapshots/{id snapshot tương ứng}`)
 
 Logic chính của notebook:
 
