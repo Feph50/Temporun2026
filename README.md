@@ -1,9 +1,10 @@
 # TempoRun 2026 Reproduce
 
-README này mô tả lại thứ tự chạy pipeline trong thư mục `temporun2026_reproduce`.
+## 1. Giới thiệu ngắn gọn về phương pháp
 
+Pipeline này dùng OmniShotCut để tách shot, lấy keyframe giữa shot, sinh thêm extra frames, tạo embedding bằng Qwen3-VL-Embedding-8B, sau đó retrieve và rerank bằng Qwen3-VL-Reranker-8B. Kết quả cuối được tinh chỉnh thêm bằng notebook temporal rerank.
 
-## File chính trong thư mục
+## 2. Mô tả cấu trúc repository
 
 | File | Vai trò |
 | --- | --- |
@@ -11,21 +12,24 @@ README này mô tả lại thứ tự chạy pipeline trong thư mục `temporun
 | `stage1_extract_extra.py` | Trích xuất thêm extra frames quanh các range/keyframe đã có. |
 | `stage2_embedding_frames.py` | Tạo embedding `.pt` cho keyframes và merge các shard embedding. |
 | `merge_temporun_keyframes_windows.py` | Gộp folder middle keyframes và extra keyframes thành một folder combined. |
-| `stage2_retrieve_and_reranker.py` | Retrieve candidates và rerank kết quả. |
+| `stage3_retrieve_and_reranker.py` | Retrieve candidates và rerank kết quả. |
 | `finalStage_temporal_frames.ipynb` | Notebook final stage để temporal rerank/top-5 rerank. |
 | `OmniShotCut/` | Source repo OmniShotCut, dùng để import package `omnishotcut/...`. |
-| `requirements.txt` | Danh sách Python packages cần cài thêm, không bao gồm `torch` và `torchvision`. |
+| `requirements.txt` | Danh sách Python packages cần cài thêm. |
 
-## Luồng chạy tổng quát
+## 3. Yêu cầu phần cứng và phần mềm
 
-1. Stage 1: tạo middle keyframes và extra keyframes.
-2. Stage 2: embed hai folder keyframes, sau đó merge thành index `.pt`.
-3. Stage 3: gộp folder keyframes, retrieve candidates, rồi rerank.
-4. Final Stage: đưa output JSON vào notebook `finalStage_temporal_frames.ipynb`.
+- GPU tối thiểu khuyến nghị: `RTX 2080 Ti 11GB`
+- Nếu có nhiều GPU, code đã được thiết kế để chạy song song và tận dụng đa GPU tốt hơn.
+- Môi trường đã kiểm tra: Ubuntu 22.04, Python 3.10.15, CUDA 12.1 devel runtime, NVIDIA driver 580.82.09, CUDA 13.0 trên host
+- `torch`, `torchvision`
+- `ffmpeg` binary trên `PATH`
+- CUDA-compatible environment
+- `ffmpeg-python` chỉ là wrapper, vẫn cần binary `ffmpeg` thật để decode video.
 
-## Cài dependencies
+Khi chạy các lệnh stage 1, 2, 3 và notebook, checkpoint `Qwen/Qwen3-VL-Embedding-8B` và `Qwen/Qwen3-VL-Reranker-8B` sẽ tự động được tải từ Hugging Face nếu chưa có sẵn local.
 
-Môi trường chạy cần có sẵn `python3`, `torch` và `torchvision`.
+## 4. Hướng dẫn cài đặt môi trường
 
 Các package còn lại cài bằng:
 
@@ -35,24 +39,89 @@ pip install -r requirements.txt
 
 Lưu ý: `ffmpeg-python` là Python wrapper. Môi trường chạy vẫn cần có binary `ffmpeg` nếu dùng các hàm decode video của OmniShotCut.
 
-## Stage 1 - Extract frames
+### Docker
 
-Output mong đợi sau stage này:
+Chạy từ thư mục `Temporun2026`:
+
+```bash
+docker build -t temporun2026:latest .
+
+docker run --gpus all -it --rm \
+  -v .:/workspace/Temporun2026 \
+  -w /workspace/Temporun2026 \
+  temporun2026:latest
+```
+
+## 5. Hướng dẫn tải checkpoint hoặc tài nguyên bổ sung
+
+Không cần tải tay checkpoint embedding/reranker trước. Khi chạy:
+
+- `stage1_extract_keyframe.py`
+- `stage1_extract_extra.py`
+- `stage2_embedding_frames.py`
+- `stage3_retrieve_and_reranker.py`
+- `finalStage_temporal_frames.ipynb`
+
+thì checkpoint `Qwen/Qwen3-VL-Embedding-8B` và `Qwen/Qwen3-VL-Reranker-8B` sẽ tự động tải từ Hugging Face nếu chưa có local cache.
+
+Tài nguyên bổ sung cần có sẵn:
+
+- video corpus `V3C`
+- file `private_round_tasks.jsonl`
+
+## 6. Mô tả dữ liệu đầu vào
+
+Stage 1 nhận dữ liệu video qua tham số `--dataset-root`.
+
+Cấu trúc dữ liệu video dự kiến:
+
+```text
+dataset/
+├── V3C1/
+│   └── videos/
+│       └── ...
+└── V3C2/
+    └── videos/
+        └── ...
+```
+
+Các script stage sau dùng:
+
+- folder keyframes đã sinh ra
+- `private_round_tasks.jsonl`
+- index `.pt`
+- folder `V3C`
+- folder model `Qwen3-VL-Reranker-8B`
+
+## 7. Mô tả kết quả đầu ra
+
+Kết quả trung gian và cuối:
 
 - `TempoRun2026_OmniShotCut_Keyframes`
 - `TempoRun2026_OmniShotCut_Extra_Keyframes_More`
+- `checkpoints_part`
+- `qwen3vl_final_full_index_8B.pt`
+- `retrieval_candidates_8B.json`
+- `submission_final_8B_rerank500_10.json`
+- `temporal_top5_rerank_final_private_task/`
+
+Output JSON cuối phải có khóa ngoài cùng là `predictions` và giữ đúng `task_id`, `rank`, `video_id`, `frame_ms`.
+
+## 8. Hướng dẫn chạy từng script
+
+### Stage 1
 
 ```bash
 # extract middle frames of each shot.
 python3 stage1_extract_keyframe.py \
---dataset-root "/V3C/V3C1" \
---dataset-root "/V3C/V3C2" \
---out "/TempoRun2026_OmniShotCut_Keyframes"
+--dataset-root "V3C/V3C1" \
+--dataset-root "V3C/V3C2" \
+--out "TempoRun2026_OmniShotCut_Keyframes"
 
 # extract extra frames
 python3 stage1_extract_extra.py \
---ranges-root "/TempoRun2026_OmniShotCut_Keyframes" \
---out "/TempoRun2026_OmniShotCut_Extra_Keyframes_More" \
+--ranges-root "TempoRun2026_OmniShotCut_Keyframes" \
+--out "TempoRun2026_OmniShotCut_Extra_Keyframes_More" \
 --candidate-fps 2 \
 --cosine-threshold 0.97 \
 --output-mode extras_only \
@@ -62,14 +131,7 @@ python3 stage1_extract_extra.py \
 --device cuda
 ```
 
-## Stage 2 - Embed keyframes và merge index
-
-Stage này tạo embedding cho:
-
-- Middle keyframes.
-- Extra keyframes.
-
-Sau đó merge các file `.pt` thành index cuối.
+### Stage 2
 
 ```bash
 python3 stage2_embedding_frames.py embed-pt  \
@@ -90,12 +152,7 @@ python3 stage2_embedding_frames.py merge \
 --out qwen3vl_final_full_index_8B.pt
 ```
 
-Output mong đợi:
-
-- `checkpoints_part`
-- `qwen3vl_final_full_index_8B.pt`
-
-## Stage 3 - Merge keyframes, retrieve và rerank
+### Stage 3
 
 Trước khi chạy, hãy sửa tên `1_CausalScoreHead` bên trong `modules.json` của `Qwen3vl-Reranker-8B` thành `1_LogitScore`.
 
@@ -123,41 +180,77 @@ python3 stage3_retrieve_and_reranker.py rerank  \
 --out "submission_final_8B_rerank500_10.json"
 ```
 
-Output mong đợi:
-
-- `retrieval_candidates_8B.json`
-- `submission_final_8B_rerank500_10.json`
-
-## Final Stage - Temporal rerank bằng notebook
+### Final stage notebook
 
 Lấy output là file `submission_final_8B_rerank500_10.json` để nạp vào file `finalStage_temporal_frames.ipynb`.
 
-Input của notebook chỉ bao gồm:
+## 9. Lệnh chạy toàn bộ pipeline
 
-- File `submission_final_8B_rerank500_10.json`.
-- Folder `V3C`.
-- File private task.
-- Folder model `Qwen3-VL-Reranker-8B`.
+Chuỗi chạy đầy đủ:
 
-Notebook hiện dùng path tương đối:
+1. `stage1_extract_keyframe.py`
+2. `stage1_extract_extra.py`
+3. `stage2_embedding_frames.py embed-pt` cho middle keyframes
+4. `stage2_embedding_frames.py embed-pt` cho extra keyframes
+5. `stage2_embedding_frames.py merge`
+6. `merge_temporun_keyframes_windows.py`
+7. `stage3_retrieve_and_reranker.py retrieve`
+8. `stage3_retrieve_and_reranker.py rerank`
+9. `finalStage_temporal_frames.ipynb`
 
-| Biến trong notebook | Path |
-| --- | --- |
-| `input_submission` | `submission_final_8B_rerank500_10.json` |
-| `tasks_jsonl_candidates` | `private_round_tasks.jsonl` |
-| `video_dataset_root` | `V3C` |
-| `reranker_model` | `Qwen3-VL-Reranker-8B` |
-| `output_dir` | `temporal_top5_rerank_final_private_task` |
+## 10. Các tham số mặc định
 
-Các path tương đối này được resolve theo current working directory của Jupyter kernel, không nhất thiết theo vị trí file `.ipynb`.
+Một số tham số mặc định chính:
 
-Khuyến nghị khi chạy notebook: đặt current working directory là folder repo, cùng cấp với `finalStage_temporal_frames.ipynb`. Khi đó output sẽ được tạo tại:
+- `stage1_extract_keyframe.py`
+  - `--device`: `cuda` nếu có GPU, ngược lại `cpu`
+  - `--mode`: `default`
+  - `--overlap-window-length`: `20`
+  - `--shard-index`: `0`
+  - `--shard-count`: `1`
 
-```text
-temporal_top5_rerank_final_private_task/
-```
+- `stage1_extract_extra.py`
+  - `--candidate-fps`: `1.0`
+  - `--cosine-threshold`: `0.98`
+  - `--output-mode`: `extras_only`
+  - `--filename-digits`: `5`
+  - `--jpeg-quality`: `92`
+  - `--batch-size`: `128`
+  - `--device`: `cuda` nếu có GPU, ngược lại `cpu`
+
+- `stage2_embedding_frames.py`
+  - `--model-id`: `Qwen/Qwen3-VL-Embedding-8B`
+  - `--checkpoint-dir`: `checkpoints_part`
+  - `--batch-size`: `16` hoặc `32` tùy subcommand
+  - `--load-in-4bit`: tắt mặc định
+  - `--truncate-dim`: `1024`
+  - `--shard-index`: `0`
+  - `--shard-count`: `1`
+
+- `stage3_retrieve_and_reranker.py`
+  - `retrieve --top-videos`: `5006`
+  - `retrieve --frames-per-video`: `257`
+  - `retrieve --cand-keyframes`: `300000`
+  - `rerank --rerank-top`: `50`
+  - `rerank --final-top`: `10`
+
+- `finalStage_temporal_frames.ipynb`
+  - `top_k`: `5`
+  - `final_top`: `10`
+  - `max_gpus`: `2`
+  - `limit_tasks`: `0`
+
+## 11. Các lỗi hoặc giới hạn đã biết
+
+- Repo phụ thuộc vào CUDA GPU để chạy đúng tốc độ và để load các model 8B.
+- Nếu không có đủ VRAM, cần bật quantization `4bit`/`8bit` như các lệnh mẫu đang dùng.
+- `ffmpeg` binary phải có sẵn trên máy.
+- Đường dẫn dataset phải đúng với mount thực tế; nếu mount khác `/V3C` thì cần đổi theo môi trường chạy.
+- `modules.json` của `Qwen3-VL-Reranker-8B` có thể cần tên module tương thích như README đã ghi.
+- Notebook final stage yêu cầu đủ `submission_final_8B_rerank500_10.json`, `private_round_tasks.jsonl`, `V3C/` và `Qwen3-VL-Reranker-8B/` trong working directory.
+- Nếu video path lưu trong metadata bị stale, stage 1/extra có fallback scan dataset nhưng vẫn cần corpus truy cập được.
 
 ## Cần BTC sửa cụ thể
 
-- Cần xác nhận sẽ mount dataset video thành `/V3C`. Nếu không, các lệnh Stage 1 cần đổi `/V3C/V3C1`, `/V3C/V3C2` sang path thật của folder `V3C`.
+- Cần chạy từ thư mục repo để các path trong lệnh là tương đối.
 - Khi chạy `finalStage_temporal_frames.ipynb`, cần đảm bảo current working directory có đủ `submission_final_8B_rerank500_10.json`, `private_round_tasks.jsonl`, `V3C/` và `Qwen3-VL-Reranker-8B/`.
