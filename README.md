@@ -113,7 +113,7 @@ python3 stage2_retrieve_and_reranker.py retrieve  \
 --out "retrieval_candidates_8B.json"
 
 python3 stage2_retrieve_and_reranker.py rerank  \
---model-id "Qwen3-VL-Reranker-8B"  \
+--model-id "Qwen/Qwen3-VL-Reranker-8B"  \
 --candidates "retrieval_candidates_8B.json"  \
 --tasks "private_round_tasks.jsonl"  \
 --index-pt "qwen3vl_final_full_index_8B.pt"  \
