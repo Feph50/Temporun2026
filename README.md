@@ -272,7 +272,7 @@ Một số tham số mặc định chính:
 - Notebook final stage yêu cầu đủ `submission_final_8B_rerank500_10.json`, `private_round_tasks.jsonl`, `V3C/` và `Qwen3-VL-Reranker-8B/` trong working directory.
 - Nếu video path lưu trong metadata bị stale, stage 1/extra có fallback scan dataset nhưng vẫn cần corpus truy cập được.
 
-## Cần BTC sửa cụ thể
+## Cần BTC chú ý
 
 - Cần chạy từ thư mục repo để các path trong lệnh là tương đối.
 - Khi chạy `finalStage_temporal_frames.ipynb`, cần đảm bảo current working directory có đủ `submission_final_8B_rerank500_10.json`, `private_round_tasks.jsonl`, `V3C/` và `Qwen3-VL-Reranker-8B/`.
